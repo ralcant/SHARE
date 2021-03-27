@@ -3,7 +3,7 @@ import json
 import facebook
 import string 
 
-ACCESS_TOKEN = "EAADVGvvhhvABAIQBBgBG1tFaCoExZBSmtheZBwHZCTABXItxcwV1SQGQLT5pbaTTnf6orP3RSfqj9DBprnom9R0exX2vuOG5AEEpazbRaYg0rR9EYQC3DadCcmxUOmwBvcnbNpPytdBlAmGv8hl08uP1oaMo5n49ajt2AYQW66ZAUnrUrkNA9VonFo7esW0ZD"
+ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD"
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
 graph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1) #what version should we use?
@@ -22,25 +22,32 @@ def convert(input): #From answer https://stackoverflow.com/questions/13101653/py
     else: #assumed to be a string
         return sanitize(input)
 
-def main():
-    # r = requests.get(f"https://graph.facebook.com/v10.0/{PAGE_ID}/published_posts?access_token={ACCESS_TOKEN}") #not sure whether to get the /feed instead of /published_posts
-    # s = unicodedata(r.text).encode("utf-8")
-    # print(s)
-    # print(r.text.encode("utf-8"))
-    # print(r.text.encode("utf-8")[494:502])
-    # x = json.loads(r.text.encode("utf-8"))
-    # print(x)
-
+def getPosts():
     posts = graph.request(f"/{PAGE_ID}/published_posts")
-    # posts = graph.get_connections(id=PAGE_ID, connection_name="feed") #seems to have a similar effect 
+    return posts 
+
+def generateComment(message):
+    return f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."
+
+def commentRandomly():
+    posts = convert(getPosts())
+    for post in posts['data']:
+        comment =  generateComment(post['message'])
+        print(f"Posting comment {comment} on confession {post['message']}")
+        graph.put_comment(object_id = post['id'], message =comment)
+
+def postDemo():
+    posts = getPosts()
     sanitized_posts = convert(posts) #TODO: Is there a way to not get rid of emojis and strange characters? 
     print(sanitized_posts)
     print("\n============ Posts retrieved ====================\n")
     for post in sanitized_posts['data']:
         print(post['message']) 
         print()
-    # print(posts.encode("utf-8"))
-    # print(posts.encoding)
-    # print(posts['data'][2]['message']) #this cannot be printed coz it contains emojis: https://www.facebook.com/permalink.php?story_fbid=100723348787362&id=100691552123875
+
+def main():
+    # postDemo()
+    commentRandomly()
+   
 if __name__ == '__main__':
     main()
