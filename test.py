@@ -46,8 +46,7 @@ def postDemo():
         print()
 
 def main():
-    # postDemo()
-    commentRandomly()
+    postDemo()
    
 if __name__ == '__main__':
     main()
