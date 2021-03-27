@@ -2,8 +2,9 @@ import requests
 import json
 import facebook
 import string 
+from decouple import config
 
-ACCESS_TOKEN = "EAADVGvvhhvABAH5i9Q4AecOrdZAYHtZCpRd14ATZCvHmSCf3dEIeC4zoQxbR4T5lZAGrRMJR5arEwiFkjHXZAajZCXgDb4UAZCW1RVhfYZBLscUJ53eZAOblp0BEd4BHerlk0El89zIqfpG0JJZAwbit6gW7vsG4sZCZBgjFAQQioSd8pKvgF59ZC4JTHenDjLyyRiPiNLk2EZBE5KZAgZDZD" #long-lived acces token
+ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
