@@ -3,6 +3,7 @@ chardet==4.0.0
 facebook-sdk==3.1.0
 idna==2.10
 openai==0.6.2
+python-decouple==3.4
 requests==2.25.1
 tqdm==4.59.0
 unicode==2.8
