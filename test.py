@@ -3,7 +3,7 @@ import json
 import facebook
 import string 
 
-ACCESS_TOKEN = "EAADVGvvhhvABAIQBBgBG1tFaCoExZBSmtheZBwHZCTABXItxcwV1SQGQLT5pbaTTnf6orP3RSfqj9DBprnom9R0exX2vuOG5AEEpazbRaYg0rR9EYQC3DadCcmxUOmwBvcnbNpPytdBlAmGv8hl08uP1oaMo5n49ajt2AYQW66ZAUnrUrkNA9VonFo7esW0ZD"
+ACCESS_TOKEN = "EAADVGvvhhvABAH5i9Q4AecOrdZAYHtZCpRd14ATZCvHmSCf3dEIeC4zoQxbR4T5lZAGrRMJR5arEwiFkjHXZAajZCXgDb4UAZCW1RVhfYZBLscUJ53eZAOblp0BEd4BHerlk0El89zIqfpG0JJZAwbit6gW7vsG4sZCZBgjFAQQioSd8pKvgF59ZC4JTHenDjLyyRiPiNLk2EZBE5KZAgZDZD"
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
 graph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1) #what version should we use?
