@@ -4,12 +4,8 @@ import facebook
 import string 
 from decouple import config
 
-<<<<<<< HEAD
 ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
-=======
-ACCESS_TOKEN = "EAADVGvvhhvABAGLMRWDQ8INYHjuLuet1eQs1oZC4SdMKbGYKS9ttmhKeWgrvvf576164qZB5zVFVrXUG9KqH3v25kE0vQ1c3gUyzpmUU3kyVKafyCTDFli9SZBFTY8p5CwXJXSPYmvjvatfSorrjEmMtT5QZCIhZCsj6jg7HgZBnHUgIMgryg8sOFQYHX1WNoEpDmFUn5WMgZDZD"
->>>>>>> e59fd20e3eac4313bc1cdbbc8b2c940d65817df4
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
 graph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1) #what version should we use?
