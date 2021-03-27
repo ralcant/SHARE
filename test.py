@@ -4,8 +4,12 @@ import facebook
 import string 
 from decouple import config
 
+<<<<<<< HEAD
 ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
+=======
+ACCESS_TOKEN = "EAADVGvvhhvABAGLMRWDQ8INYHjuLuet1eQs1oZC4SdMKbGYKS9ttmhKeWgrvvf576164qZB5zVFVrXUG9KqH3v25kE0vQ1c3gUyzpmUU3kyVKafyCTDFli9SZBFTY8p5CwXJXSPYmvjvatfSorrjEmMtT5QZCIhZCsj6jg7HgZBnHUgIMgryg8sOFQYHX1WNoEpDmFUn5WMgZDZD"
+>>>>>>> e59fd20e3eac4313bc1cdbbc8b2c940d65817df4
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
 graph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1) #what version should we use?
@@ -25,20 +29,38 @@ def convert(input): #From answer https://stackoverflow.com/questions/13101653/py
         return sanitize(input)
 
 def getPosts():
+    """Get all of the posts on the page"""
     posts = graph.request(f"/{PAGE_ID}/published_posts")
     return posts 
 
 def generateComment(message):
+    """Function to generate a comment based on a given message.."""
     return f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."
 
 def commentRandomly():
+    """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts())
     for post in posts['data']:
         comment =  generateComment(post['message'])
         print(f"Posting comment {comment} on confession {post['message']}")
         graph.put_comment(object_id = post['id'], message =comment)
 
+def makePost(message):
+    """Makes a post on the page with the given message"""
+    print(f"Making post: {message}")
+    graph.put_object(parent_object='me', connection_name='feed', message=message)
+
+def makePostPrompt(message):
+    """Makes a post on the page with the given message.. but prompts us first if its okay"""
+    print(f"\nIs this post okay? (respond YES or NO): {message}")
+    ans = input()
+    if ans == "YES":
+        makePost(message)
+    else:
+        print("Okay, will not make post.")
+
 def postDemo():
+    """Prints all the posts on the page"""
     posts = getPosts()
     sanitized_posts = convert(posts) #TODO: Is there a way to not get rid of emojis and strange characters? 
     print(sanitized_posts)
