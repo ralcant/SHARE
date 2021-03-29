@@ -33,13 +33,28 @@ def generateComment(message):
     """Function to generate a comment based on a given message.."""
     return f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."
 
-def commentRandomly():
+def commentRandomly(generateComment=generateComment, prompt=True):
     """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts())
     for post in posts['data']:
+        if prompt:
+            print(f"Want to post a comment on confession {post['message']}? ({len(post['message'])/4 + 100} tokens) (YES or NO):")
+            ans = input()
+            if ans == "NO":
+                continue 
         comment =  generateComment(post['message'])
-        print(f"Posting comment {comment} on confession {post['message']}")
-        graph.put_comment(object_id = post['id'], message =comment)
+        print(f"Will post comment {comment} on confession {post['message']}")
+        if prompt:
+            print(f"\nIs this comment okay? (respond YES or NO)")
+            ans = input()
+            if ans == "YES":
+                print(f"Posted comment")
+                graph.put_comment(object_id = post['id'], message =comment)
+            else:
+                print("Okay, will not comment.")
+        else:
+            graph.put_comment(object_id = post['id'], message =comment)
+        
 
 def makePost(message):
     """Makes a post on the page with the given message"""
