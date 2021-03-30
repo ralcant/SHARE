@@ -64,6 +64,8 @@ def generateConfessionGPT3():
     pass
 
 def generateConfessionGPT2():
+    #  This function is broken. ignore this.
+
    # prompt = "\n-------------\n".join(getPrompt()[:8])
     prompt = getPrompt()[:8]
     inputs = [tokenizer.encode(p, return_tensors='pt') for p in prompt]
@@ -89,8 +91,8 @@ def generateCommentGPT3(msg):
     return response.choices[0].text.strip()
 
 def main():
-    # commentWithGPT3()
-    pass
+    commentWithGPT3()
+    # pass
 
     
 
