@@ -70,14 +70,24 @@ def makePostPrompt(message):
     else:
         print("Okay, will not make post.")
 
+def getCommentsFromPost(post_id):
+    """Get the comments from a given post"""
+    comments = graph.get_connections(id=post_id, connection_name='comments')
+    return convert(comments['data']) #TODO: Should the sanitization be now or later? (to only the 'message field)
+
 def postDemo():
-    """Prints all the posts on the page"""
+    """Prints all the posts (and their comments!) on the page"""
     posts = getPosts()
     sanitized_posts = convert(posts) #TODO: Is there a way to not get rid of emojis and strange characters? 
     print(sanitized_posts)
     print("\n============ Posts retrieved ====================\n")
     for post in sanitized_posts['data']:
-        print(post['message']) 
+        print("Post:")
+        print("\t"+post['message']) 
+        print("Comments:")
+        all_comments = getCommentsFromPost(post['id'])
+        for i, comment in enumerate(all_comments):
+            print(f"\t{i}."+comment['message'])
         print()
 
 def main():
