@@ -4,11 +4,14 @@ import json
 import openai 
 import torch
 from test import commentRandomly
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, pipeline, set_seed
 from decouple import config
-openai.api_key = config("OPENAI_ACCESS_TOKEN")
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+generator = pipeline('text-generation', model='gpt2')
+
+# penai.api_key = config("OPENAI_ACCESS_TOKEN")
+# tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+# model = GPT2LMHeadModel.from_pretrained('gpt2')
 
 def readData():
     """Loads all confessions from data.json"""
@@ -63,35 +66,34 @@ def generateConfessionGPT3():
     #    makePostPrompt(choice['text'])
     pass
 
-def generateConfessionGPT2():
-    #  This function is broken. ignore this.
-
-   # prompt = "\n-------------\n".join(getPrompt()[:8])
-    prompt = getPrompt()[:8]
-    inputs = [tokenizer.encode(p, return_tensors='pt') for p in prompt]
-    print(f"Inputs: {inputs}")
-    outputs = model.generate(inputs, max_tokens=200, do_sample=True, top_k=50, max_length=1000, num_return_sequences=1)
-    print(f"Outputs: {outputs}")
-    text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(text)
+def generateCommentGPT2(msg):
+    q = msg[(msg.index(" ")+1):]
+    prompt = f"Human: {q}\nAI:" 
+    text = generator(prompt, max_length=100, num_return_sequences=1)
+    # print(text)
+    return text[0]['generated_text'][len(prompt):]
     # makePostPrompt(text)
 
 def commentWithGPT3():
     commentRandomly(generateCommentGPT3)
+
+def commentWithGPT2():
+    commentRandomly(generateCommentGPT2, prompt=False)
+
 
 def generateCommentGPT3(msg):
     q = msg[(msg.index(" ")+1):]
     response = openai.Completion.create(
         engine="davinci",
         prompt=f"Human: {q}\nAI: ",
-        stop=["\nHuman"],
+        stop=["\nHuman:"],
         max_tokens=100
     )
 
     return response.choices[0].text.strip()
 
 def main():
-    commentWithGPT3()
+    commentWithGPT2()
     # pass
 
     

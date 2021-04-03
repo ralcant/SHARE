@@ -33,7 +33,7 @@ def generateComment(message):
     """Function to generate a comment based on a given message.."""
     return f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."
 
-def commentRandomly(generateComment=generateComment, prompt=True):
+def commentRandomly(generateComment=generateComment, prompt=True, secondPrompt=True):
     """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts())
     for post in posts['data']:
@@ -43,9 +43,9 @@ def commentRandomly(generateComment=generateComment, prompt=True):
             if ans == "NO":
                 continue 
         comment =  generateComment(post['message'])
-        print(f"Will post comment {comment} on confession {post['message']}")
-        if prompt:
-            print(f"\nIs this comment okay? (respond YES or NO)")
+        print(f"\n----\nCONFESSION: {post['message']}\n----\nCOMMENT: {comment}\n----")
+        if secondPrompt:
+            print(f"Is this comment okay? (respond YES or NO)")
             ans = input()
             if ans == "YES":
                 print(f"Posted comment")
