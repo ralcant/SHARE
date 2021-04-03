@@ -1,17 +1,27 @@
 from test import getPosts 
 from test import makePostPrompt
 import json
-import openai 
-import torch
+# import openai 
+# import torch
 from test import commentRandomly
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, pipeline, set_seed
-from decouple import config
+# from transformers import GPT2LMHeadModel, GPT2Tokenizer, pipeline, set_seed
+# from decouple import config
+# import gpt_2_simple as gpt2
+import os
+import requests
 
-generator = pipeline('text-generation', model='gpt2')
+
+# generator = pipeline('text-generation', model='gpt2')
 
 # penai.api_key = config("OPENAI_ACCESS_TOKEN")
 # tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 # model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+#model_name = "124M"
+#if not os.path.isdir(os.path.join("models", model_name)):
+#	print(f"Downloading {model_name} model...")
+#	gpt2.download_gpt2(model_name=model_name)   # model is saved into current directory under /models/124M/
+
 
 def readData():
     """Loads all confessions from data.json"""
@@ -80,6 +90,8 @@ def commentWithGPT3():
 def commentWithGPT2():
     commentRandomly(generateCommentGPT2, prompt=False)
 
+def commentWithFinetunedGPT2():
+    pass
 
 def generateCommentGPT3(msg):
     q = msg[(msg.index(" ")+1):]
@@ -93,8 +105,9 @@ def generateCommentGPT3(msg):
     return response.choices[0].text.strip()
 
 def main():
-    commentWithGPT2()
-    # pass
+    f = open("trainingConfessions.txt", "a")
+    f.write("\n".join(getPrompt()))
+    f.close()
 
     
 
