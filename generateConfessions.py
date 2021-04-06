@@ -4,18 +4,18 @@ import json
 # import openai 
 # import torch
 from test import commentRandomly
-# from transformers import GPT2LMHeadModel, GPT2Tokenizer, pipeline, set_seed
+from transformers import pipeline
 # from decouple import config
 # import gpt_2_simple as gpt2
-import os
-import requests
+# import os
+# import requests
 
 
-# generator = pipeline('text-generation', model='gpt2')
+generator = pipeline('text-generation', model='gpt2')
 
-# penai.api_key = config("OPENAI_ACCESS_TOKEN")
+# openai.api_key = config("OPENAI_ACCESS_TOKEN")
 # tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-# model = GPT2LMHeadModel.from_pretrained('gpt2')
+# odel = GPT2LMHeadModel.from_pretrained('gpt2')
 
 #model_name = "124M"
 #if not os.path.isdir(os.path.join("models", model_name)):
@@ -79,7 +79,7 @@ def generateConfessionGPT3():
 def generateCommentGPT2(msg):
     q = msg[(msg.index(" ")+1):]
     prompt = f"Human: {q}\nAI:" 
-    text = generator(prompt, max_length=100, num_return_sequences=1)
+    text = generator(prompt, max_length=len(" ".split(prompt))+50, num_return_sequences=1)
     # print(text)
     return text[0]['generated_text'][len(prompt):]
     # makePostPrompt(text)
@@ -105,9 +105,7 @@ def generateCommentGPT3(msg):
     return response.choices[0].text.strip()
 
 def main():
-    f = open("trainingConfessions.txt", "a")
-    f.write("\n".join(getPrompt()))
-    f.close()
+    commentWithGPT2()
 
     
 

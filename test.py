@@ -2,6 +2,7 @@ import requests
 import json
 import facebook
 import string 
+from rich import print
 from decouple import config
 
 ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
@@ -38,12 +39,12 @@ def commentRandomly(generateComment=generateComment, prompt=True, secondPrompt=T
     posts = convert(getPosts())
     for post in posts['data']:
         if prompt:
-            print(f"Want to post a comment on confession {post['message']}? ({len(post['message'])/4 + 100} tokens) (YES or NO):")
+            print(f"Want to post a comment on confession \n[#f5a6ff]{post['message']}[/#f5a6ff]? ({len(post['message'])/4 + 100} tokens) (YES or NO):")
             ans = input()
             if ans == "NO":
                 continue 
         comment =  generateComment(post['message'])
-        print(f"\n----\nCONFESSION: {post['message']}\n----\nCOMMENT: {comment}\n----")
+        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----\nCOMMENT: [#03c6fc]{comment}[/#03c6fc]\n----")
         if secondPrompt:
             print(f"Is this comment okay? (respond YES or NO)")
             ans = input()
