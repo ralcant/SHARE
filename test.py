@@ -34,6 +34,9 @@ def generateComment(message):
     """Function to generate a comment based on a given message.."""
     return [f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."]
 
+
+def makeComment(post, comment):
+    graph.put_comment(object_id = post['id'], message =comment)
 def commentRandomly(generateComment=generateComment, num=1, prompt=True, secondPrompt=True):
     """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts(PAGE_ID))
