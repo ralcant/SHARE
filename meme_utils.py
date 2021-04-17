@@ -12,6 +12,13 @@ class MemeGenerator:
     def get_all_memes(self):
         data = requests.get(f"{self.api_root}/get_memes").json()
         return data['data']['memes']
+    def create_and_post_meme(self, meme_id, post_id, top_text="", bottom_text="", extra_message=""):
+        res = self.create_meme(meme_id, [top_text, bottom_text]) #create meme in the imgflip server
+        local_image = "images/aaaaa.jpg" # TODO: Make it random, different for different pictures
+        res = self.save_local_meme(res, local_image) # race condition?
+        res = self.post_local_meme_facebook(post_id, local_image, extra_message)
+        print(res)
+        return res
     def create_meme(self, meme_id, text_list):
         text_template = {f"text{i}": text for i, text in enumerate(text_list)}
         data = {
@@ -38,7 +45,7 @@ class MemeGenerator:
             album_path=res['id'], 
             message= extra_message
         )
-        return comment_info
+        return res #info about the facebook post
 
 def demo():
     meme_generator = MemeGenerator("mit_meme_creator", "mit_meme_password")
