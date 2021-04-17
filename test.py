@@ -25,36 +25,41 @@ def convert(input): #From answer https://stackoverflow.com/questions/13101653/py
     else: #assumed to be a string
         return sanitize(input)
 
-def getPosts():
+def getPosts(MY_PAGE_ID):
     """Get all of the posts on the page"""
-    posts = graph.request(f"/{PAGE_ID}/published_posts")
+    posts = graph.request(f"/{MY_PAGE_ID}/published_posts")
     return posts 
 
 def generateComment(message):
     """Function to generate a comment based on a given message.."""
-    return f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."
+    return [f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."]
 
-def commentRandomly(generateComment=generateComment, prompt=True, secondPrompt=True):
+def commentRandomly(generateComment=generateComment, num=1, prompt=True, secondPrompt=True):
     """Comments on every confession on the page using generateComment"""
-    posts = convert(getPosts())
+    posts = convert(getPosts(PAGE_ID))
     for post in posts['data']:
         if prompt:
             print(f"Want to post a comment on confession \n[#f5a6ff]{post['message']}[/#f5a6ff]? ({len(post['message'])/4 + 100} tokens) (YES or NO):")
             ans = input()
             if ans == "NO":
                 continue 
-        comment =  generateComment(post['message'])
-        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----\nCOMMENT: [#03c6fc]{comment}[/#03c6fc]\n----")
-        if secondPrompt:
-            print(f"Is this comment okay? (respond YES or NO)")
+        comments =  generateComment(post['message'], num)
+        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
+        for i in range(len(comments)):
+            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
+        if secondPrompt or (len(comments) > 1):
+            print(f"Which comment to post? (respond number or NO)")
             ans = input()
-            if ans == "YES":
-                print(f"Posted comment")
-                graph.put_comment(object_id = post['id'], message =comment)
-            else:
+            done = False 
+            for i in range(len(comments)):
+                if ans ==str(i+1)+"":
+                    print(f"Posted comment")
+                    graph.put_comment(object_id = post['id'], message =comments[i])
+                    done = True 
+            if not done:
                 print("Okay, will not comment.")
         else:
-            graph.put_comment(object_id = post['id'], message =comment)
+            graph.put_comment(object_id = post['id'], message =comments[0])
         
 
 def makePost(message):
@@ -64,12 +69,15 @@ def makePost(message):
 
 def makePostPrompt(message):
     """Makes a post on the page with the given message.. but prompts us first if its okay"""
-    print(f"\nIs this post okay? (respond YES or NO): {message}")
+    print(f"\n----\nCONFESSION: [#f5a6ff]{message}[/#f5a6ff]")
+    print(f"\nIs this post okay? (respond YES or NO):")
     ans = input()
     if ans == "YES":
         makePost(message)
+        return True 
     else:
         print("Okay, will not make post.")
+        return False
 
 def getCommentsFromPost(post_id):
     """Get the comments from a given post"""
@@ -78,7 +86,7 @@ def getCommentsFromPost(post_id):
 
 def postDemo():
     """Prints all the posts (and their comments!) on the page"""
-    posts = getPosts()
+    posts = getPosts(PAGE_ID)
     sanitized_posts = convert(posts) #TODO: Is there a way to not get rid of emojis and strange characters? 
     print(sanitized_posts)
     print("\n============ Posts retrieved ====================\n")
