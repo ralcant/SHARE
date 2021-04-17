@@ -1,6 +1,7 @@
 from decouple import config
 from test import getPosts
 from test import convert
+from test import makeComment
 import facebook
 from rich import print
 from rich.console import Console
@@ -36,16 +37,29 @@ def promptAccounts():
 #    return info[index]['pageId']
 def choosePost(posts):
     choices = []
-    for i in range(len(posts)):
+    for i in range(min(len(posts), 10)):
         clipmsg = posts[i]['message'].split('\n')[0]
         choices.append(f"[white]{(clipmsg)[:(size-6)]}[/white]")
-    choices.append(f"[pink]Write my own post[/pink]")
+    choices.append(f"[#FFB6C1]Generate New Post[/#FFB6C1]")
     index = options("[bold]Pick a post:[/bold]", choices)
     if(index == len(choices)-1):
         index = -1 
     return index
     
-    
+def generateComment(post):
+    comments = generateCommentGPT2(post['message'], num=5)
+    for i in range(len(comments)):
+        print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
+    print(f"Which comment to post? (respond number or NO)")
+    ans = input()
+    done = False 
+    for i in range(len(comments)):
+        if ans ==str(i+1)+"":
+            print(f"Posted comment")
+            makeComment(post, comments[i])
+            done = True 
+    if not done:
+        print("Okay, will not comment.")
 def main():
     os.system("clear")
     console.rule("[bold blue]Welcome to SHARE, the MIT Confessions Bot")
@@ -59,22 +73,18 @@ def main():
         index = choosePost(posts)
         if index == -1:
             postRandomConfessions()
+            posts = convert(getPosts(pageId))['data']
             continue
         post = posts[index]
         print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
-        comments = generateCommentGPT2(post['message'], num=5)
-        for i in range(len(comments)):
-            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
-        print(f"Which comment to post? (respond number or NO)")
-        ans = input()
-        done = False 
-        for i in range(len(comments)):
-            if ans ==str(i+1)+"":
-                print(f"Posted comment")
-                graph.put_comment(object_id = post['id'], message =comments[i])
-                done = True 
-        if not done:
-            print("Okay, will not comment.")
+        index = options("[bold]What type of Comment?[/bold] (Enter number to continue)", ["GPT2 Generated Comment", "Write My Own"])
+        if index == 0:
+            generateComment(post)
+        else:
+            print("[#03c6fc]Type Comment:[/#03c6fc]")
+            comment = input() 
+            makeComment(post, comment)
+            print("[white]Posted[/white]")
 
     
     
