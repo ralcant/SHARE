@@ -5,6 +5,7 @@ import json
 # import torch
 from test import commentRandomly
 from transformers import pipeline
+import random
 # from decouple import config
 # import gpt_2_simple as gpt2
 # import os
@@ -56,11 +57,17 @@ def getPrompt():
         prompt.append(confessions[i]['message'])
     return prompt
 
-def postSomeConfessions():
+def postSomeConfessions(i, j):
     confessions = readData()
     # print(confessions[:5])
-    for i in range(15):
-        makePostPrompt(confessions[i]['message'])
+    for k in range(i, j):
+        makePostPrompt(confessions[k]['message'])
+
+def postRandomConfessions():
+    while True:
+        val = makePostPrompt(random.choice(confessions)['message'])
+        if val:
+            break
 
 def generateConfessionGPT3():
     # be careful when running this.. uses tokens!! not free!!
@@ -76,19 +83,19 @@ def generateConfessionGPT3():
     #    makePostPrompt(choice['text'])
     pass
 
-def generateCommentGPT2(msg):
+def generateCommentGPT2(msg, num=1):
     q = msg[(msg.index(" ")+1):]
-    prompt = f"Human: {q}\nAI:" 
-    text = generator(prompt, max_length=len(" ".split(prompt))+50, num_return_sequences=1)
+    prompt = f"{q}\n RESPONSE: " 
+    text = generator(prompt, max_length=len(prompt.split(" "))+100, num_return_sequences=num)
     # print(text)
-    return text[0]['generated_text'][len(prompt):]
+    return [text[i]['generated_text'][len(prompt):] for i in range(num)]
     # makePostPrompt(text)
 
 def commentWithGPT3():
     commentRandomly(generateCommentGPT3)
 
-def commentWithGPT2():
-    commentRandomly(generateCommentGPT2, prompt=False)
+def commentWithGPT2(num=1):
+    commentRandomly(generateCommentGPT2, num=num, prompt=False)
 
 def commentWithFinetunedGPT2():
     pass
@@ -102,11 +109,10 @@ def generateCommentGPT3(msg):
         max_tokens=100
     )
 
-    return response.choices[0].text.strip()
+    return [response.choices[0].text.strip()]
 
 def main():
-    commentWithGPT2()
-
+    commentWithGPT2(num=5)
     
 
    
