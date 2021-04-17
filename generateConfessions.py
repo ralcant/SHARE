@@ -63,9 +63,10 @@ def postSomeConfessions(i, j):
     for k in range(i, j):
         makePostPrompt(confessions[k]['message'])
 
-def postRandomConfessions():
+def postRandomConfessions(graph):
+    confessions = readData()
     while True:
-        val = makePostPrompt(random.choice(confessions)['message'])
+        val = makePostPrompt(graph, random.choice(confessions)['message'])
         if val:
             break
 
