@@ -2,6 +2,7 @@ from decouple import config
 from test import getPosts
 from test import convert
 from test import makeComment
+from test import setAccount
 import facebook
 from rich import print
 from rich.console import Console
@@ -53,7 +54,7 @@ def choosePost(posts):
         index = -2
     return index
     
-def generateComment(post):
+def generateComment(graph, post):
     comments = generateCommentGPT2(post['message'], num=5)
     for i in range(len(comments)):
         print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
@@ -63,7 +64,7 @@ def generateComment(post):
     for i in range(len(comments)):
         if ans ==str(i+1)+"":
             print(f"Posted comment")
-            makeComment(post, comments[i])
+            makeComment(graph, post, comments[i])
             done = True 
     if not done:
         print("Okay, will not comment.")
@@ -73,16 +74,16 @@ def main():
     print()
     print("[cyan]Login Info")
     login = promptAccounts()
-    pageId = login['pageId']# promptPage()
-    graph = facebook.GraphAPI(access_token=login['access_token'], version = 3.1) #what version should we use?
-    posts = convert(getPosts(pageId))['data']
+    graph = setAccount(login)
+    memer = MemeGenerator("mit_meme_creator", "mit_meme_password", graph)
+    posts = convert(getPosts(graph, login['pageId']))['data']
     while True:
         index = choosePost(posts)
         if index == -1:
             break
         if index == -2:
             postRandomConfessions()
-            posts = convert(getPosts(pageId))['data']
+            posts = convert(getPosts(graph, login['pageId']))['data']
             continue
         post = posts[index]
         print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
@@ -92,7 +93,7 @@ def main():
         elif index == 1:
             print("[#03c6fc]Type Comment:[/#03c6fc]")
             comment = input() 
-            makeComment(post, comment)
+            makeComment(graph, post, comment)
             print("[white]Posted[/white]")
         else:
             memes = memer.get_all_memes()

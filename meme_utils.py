@@ -5,9 +5,10 @@ from test import *
 
 
 class MemeGenerator:
-    def __init__(self, username, password):
+    def __init__(self, username, password, graph=-1):
         self.username = username
         self.password = password
+        self.graph = graph
         self.api_root = "https://api.imgflip.com"
     def get_all_memes(self):
         data = requests.get(f"{self.api_root}/get_memes").json()
@@ -17,7 +18,7 @@ class MemeGenerator:
         local_image = "images/aaaaa.jpg" # TODO: Make it random, different for different pictures
         res = self.save_local_meme(res, local_image) # race condition?
         res = self.post_local_meme_facebook(post_id, local_image, extra_message)
-        print(res)
+        # print(res)
         return res
     def create_meme(self, meme_id, text_list):
         text_template = {f"text{i}": text for i, text in enumerate(text_list)}
@@ -39,8 +40,8 @@ class MemeGenerator:
         return 
     def post_local_meme_facebook(self, post_id, meme_location, extra_message=""):
         comment= "here an image should goooo" #this comment will be edited
-        res = graph.put_comment(object_id= post_id, message= comment ) #create comment
-        comment_info = graph.put_photo( #put an image (and a new comment) in the created comment
+        res = self.graph.put_comment(object_id= post_id, message= comment ) #create comment
+        comment_info = self.graph.put_photo( #put an image (and a new comment) in the created comment
             image=open(meme_location, 'rb'), 
             album_path=res['id'], 
             message= extra_message
@@ -60,4 +61,5 @@ def demo():
         print(res)
         break
 if __name__ == "__main__":
-    print(demo())
+    # print(demo())
+    pass

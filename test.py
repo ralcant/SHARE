@@ -9,7 +9,9 @@ ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 
-graph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1) #what version should we use?
+def setAccount(info={'access_token': ACCESS_TOKEN, 'pageId': PAGE_ID}):
+    return facebook.GraphAPI(access_token=info['access_token'], version = 3.1) #what version should we use?
+    
 
 def sanitize(s): #Taken from https://stackoverflow.com/a/8689826/14127936
     """Sanitize the input s by only keeping punctuation, digits, ascii letters and whitespace"""
@@ -25,7 +27,7 @@ def convert(input): #From answer https://stackoverflow.com/questions/13101653/py
     else: #assumed to be a string
         return sanitize(input)
 
-def getPosts(MY_PAGE_ID):
+def getPosts(graph, MY_PAGE_ID=PAGE_ID):
     """Get all of the posts on the page"""
     posts = graph.request(f"/{MY_PAGE_ID}/published_posts")
     return posts 
@@ -35,11 +37,11 @@ def generateComment(message):
     return [f"Hahaha this is a great confession!!! I really relate to this.. especially the part about \"{message[:10]}\" really moved me reading about it..."]
 
 
-def makeComment(post, comment):
+def makeComment(graph, post, comment):
     graph.put_comment(object_id = post['id'], message =comment)
-def commentRandomly(generateComment=generateComment, num=1, prompt=True, secondPrompt=True):
+def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, secondPrompt=True, pageId=PAGE_ID):
     """Comments on every confession on the page using generateComment"""
-    posts = convert(getPosts(PAGE_ID))
+    posts = convert(getPosts(pageId))
     for post in posts['data']:
         if prompt:
             print(f"Want to post a comment on confession \n[#f5a6ff]{post['message']}[/#f5a6ff]? ({len(post['message'])/4 + 100} tokens) (YES or NO):")
@@ -65,31 +67,31 @@ def commentRandomly(generateComment=generateComment, num=1, prompt=True, secondP
             graph.put_comment(object_id = post['id'], message =comments[0])
         
 
-def makePost(message):
+def makePost(graph, message):
     """Makes a post on the page with the given message"""
     print(f"Making post: {message}")
     graph.put_object(parent_object='me', connection_name='feed', message=message)
 
-def makePostPrompt(message):
+def makePostPrompt(graph, message):
     """Makes a post on the page with the given message.. but prompts us first if its okay"""
     print(f"\n----\nCONFESSION: [#f5a6ff]{message}[/#f5a6ff]")
     print(f"\nIs this post okay? (respond YES or NO):")
     ans = input()
     if ans == "YES":
-        makePost(message)
+        makePost(graph, message)
         return True 
     else:
         print("Okay, will not make post.")
         return False
 
-def getCommentsFromPost(post_id):
+def getCommentsFromPost(graph, post_id):
     """Get the comments from a given post"""
     comments = graph.get_connections(id=post_id, connection_name='comments')
     return convert(comments['data']) #TODO: Should the sanitization be now or later? (to only the 'message field)
 
-def postDemo():
+def postDemo(pageId=PAGE_ID):
     """Prints all the posts (and their comments!) on the page"""
-    posts = getPosts(PAGE_ID)
+    posts = getPosts(pageId)
     sanitized_posts = convert(posts) #TODO: Is there a way to not get rid of emojis and strange characters? 
     print(sanitized_posts)
     print("\n============ Posts retrieved ====================\n")
