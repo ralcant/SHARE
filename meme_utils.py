@@ -46,7 +46,9 @@ class MemeGenerator:
             album_path=res['id'], 
             message= extra_message
         )
-        return res #info about the facebook post
+        story_fbid, comment_id = res['id'].split("_")
+        meme_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post_id}&comment_id={comment_id}"
+        return meme_link #link to the fb post
 
 def demo():
     meme_generator = MemeGenerator("mit_meme_creator", "mit_meme_password")

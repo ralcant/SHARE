@@ -38,7 +38,10 @@ def generateComment(message):
 
 
 def makeComment(graph, post, comment):
-    graph.put_comment(object_id = post['id'], message =comment)
+    res = graph.put_comment(object_id = post['id'], message =comment)
+    story_fbid, comment_id = res['id'].split("_")
+    comment_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post['id']}&comment_id={comment_id}"
+    return comment_link
 def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, secondPrompt=True, pageId=PAGE_ID):
     """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts(pageId))
