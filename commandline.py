@@ -64,13 +64,15 @@ def generateComment(graph, post):
     print(f"Which comment to post? (respond number or NO)")
     ans = input()
     done = False 
+    comment_link = None
     for i in range(len(comments)):
         if ans ==str(i+1)+"":
             print(f"Posted comment")
-            makeComment(graph, post, comments[i])
+            comment_link = makeComment(graph, post, comments[i])
             done = True 
     if not done:
         print("Okay, will not comment.")
+    return comment_link
 def main():
     os.system("clear")
     console.rule("[bold blue]Welcome to SHARE, the MIT Confessions Bot")
@@ -96,8 +98,8 @@ def main():
         elif index == 1:
             print("[#03c6fc]Type Comment:[/#03c6fc]")
             comment = input() 
-            makeComment(graph, post, comment)
-            print("[white]Posted[/white]")
+            comment_link = makeComment(graph, post, comment)
+            print(f"[bold]Posted. See it here {comment_link} [/bold]")
         else:
             memes = memer.get_all_memes()
             names = [meme['name'] for meme in memes]
@@ -109,9 +111,7 @@ def main():
             print("[#03c6fc]Type extra message[/#03c6fc]") 
             extra_message = input()
 
-            res = memer.create_and_post_meme(memes[i]['id'], post['id'], top_text, bottom_text, extra_message)
-            story_fbid, comment_id = res['id'].split("_")
-            meme_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post['id']}&comment_id={comment_id}"
+            meme_link = memer.create_and_post_meme(memes[i]['id'], post['id'], top_text, bottom_text, extra_message)
             print(f"[bold]Posted meme!. See it here: {meme_link}[/bold]")    
 
 
