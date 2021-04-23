@@ -49,9 +49,9 @@ def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, 
             if ans == "NO":
                 continue 
         comments =  generateComment(post['message'], num)
-        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
+        print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]")
         for i in range(len(comments)):
-            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
+            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]")
         if secondPrompt or (len(comments) > 1):
             print(f"Which comment to post? (respond number or NO)")
             ans = input()
