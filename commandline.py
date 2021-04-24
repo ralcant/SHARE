@@ -13,6 +13,18 @@ import os
 import shutil
 console = Console()
 import json
+
+from ibm_watson import ToneAnalyzerV3
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+
+api_key = config('WATSON_KEY') 
+url = config('WATSON_URL')
+
+# authentication + setup for ibm_watson tone analyzer
+authenticator = IAMAuthenticator(apikey=api_key)
+tone_analyzer = ToneAnalyzerV3(version='2017-09-21', authenticator=authenticator)
+tone_analyzer.set_service_url(url)
+
 info = json.loads(config("ACCESS_TOKENS"))
 print(info)
 print(shutil.get_terminal_size())
@@ -43,8 +55,9 @@ def promptAccounts():
 def choosePost(posts):
     choices = []
     for i in range(min(len(posts), 10)):
+        tone = tone_analyzer.tone(posts[i]['message']).get_result()['document_tone']['tones'][0]['tone_id'].upper()
         clipmsg = posts[i]['message'].split('\n')[0]
-        choices.append(f"[white]{(clipmsg)[:(size-6)]}[/white]")
+        choices.append(f"[white]{ ('[' + tone + '] ' + clipmsg)[:(size-6)]}[/white]")
     choices.append(f"[#FFB6C1]Generate New Post[/#FFB6C1]")
     choices.append(f"[#FFB6C1]Quit[/#FFB6C1]")
     index = options("[bold]Pick a post:[/bold]", choices)
@@ -53,7 +66,7 @@ def choosePost(posts):
     if(index == len(choices)-2):
         index = -2
     return index
-    
+
 def generateComment(graph, post):
     comments = generateCommentGPT2(post['message'], num=5)
     for i in range(len(comments)):
@@ -91,7 +104,8 @@ def main():
         print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
         index = options("[bold]What type of Comment?[/bold] (Enter number to continue)", ["GPT2 Generated Comment", "Write My Own", "Write custom message with meme"])
         if index == 0:
-            generateComment(post)
+            print(post)
+            generateComment(graph, post)
         elif index == 1:
             print("[#03c6fc]Type Comment:[/#03c6fc]")
             comment = input() 
