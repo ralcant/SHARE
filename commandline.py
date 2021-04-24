@@ -10,6 +10,8 @@ from generateConfessions import generateCommentGPT2
 from generateConfessions import postRandomConfessions
 from meme_utils import MemeGenerator
 import os
+import pyperclip
+from facebook_scraper import get_posts
 import shutil
 console = Console()
 import json
@@ -30,12 +32,15 @@ print(info)
 print(shutil.get_terminal_size())
 size = int(shutil.get_terminal_size()[0])
 memer = MemeGenerator("mit_meme_creator", "mit_meme_password")
-def options(headerText, choices): 
+def options(headerText, choices, start=0): 
     print(headerText)
-    i = 0
-    for ch in choices:
+    i = start
+    for index in range(start, min(start+10, len(choices))):
         i += 1
-        print(f"({i}) {ch}") 
+        print(f"[blue]({i})[/blue] [white]{choices[index]}[/white]") 
+    i += 1
+    if(i != len(choices)+1):
+        print(f"({i}) See More")
     ans = ""
     while True:
         try: 
@@ -44,6 +49,9 @@ def options(headerText, choices):
             break
         except:
             pass
+    
+    if(num+1 == i):
+        return options(headerText, choices, start+10)
     print(f"[bold]You chose[/bold] {ans}")
     return num
 def promptAccounts():
@@ -60,14 +68,14 @@ def choosePost(posts):
         choices.append(f"[white]{ ('[' + tone + '] ' + clipmsg)[:(size-6)]}[/white]")
     choices.append(f"[#FFB6C1]Generate New Post[/#FFB6C1]")
     choices.append(f"[#FFB6C1]Quit[/#FFB6C1]")
+    for i in range(len(posts)):
+        clipmsg = posts[i]['message'].split('\n')[0]
+        choices.append(f"[white]{(clipmsg)[:(size-6)]}[/white]")
+    
     index = options("[bold]Pick a post:[/bold]", choices)
-    if(index == len(choices)-1):
-        index = -1 
-    if(index == len(choices)-2):
-        index = -2
     return index
-
-def generateComment(graph, post):
+    
+def generateComment(graph, post, link=''):
     comments = generateCommentGPT2(post['message'], num=5)
     for i in range(len(comments)):
         print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
@@ -77,12 +85,24 @@ def generateComment(graph, post):
     comment_link = None
     for i in range(len(comments)):
         if ans ==str(i+1)+"":
-            print(f"Posted comment")
+            print(f"Posting comment...")
             comment_link = makeComment(graph, post, comments[i])
             done = True 
     if not done:
         print("Okay, will not comment.")
     return comment_link
+def getPostsWrapper(index, graph=None, login=None):
+    if index == 0:
+        return convert(getPosts(graph, login['pageId']))['data']
+    else: #index=1, for now just beaverconfessions
+        posts = []
+        for post in get_posts('beaverconfessions',pages=5):
+            new_post = {}
+            new_post['message'] = convert(post['post_text'])
+            new_post['link'] = post['post_url']
+            new_post['id'] = post['post_id']
+            posts.append(new_post)
+        return posts
 def main():
     os.system("clear")
     console.rule("[bold blue]Welcome to SHARE, the MIT Confessions Bot")
@@ -91,26 +111,28 @@ def main():
     login = promptAccounts()
     graph = setAccount(login)
     memer = MemeGenerator("mit_meme_creator", "mit_meme_password", graph)
-    posts = convert(getPosts(graph, login['pageId']))['data']
+    page_index = options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
+    posts = getPostsWrapper(page_index, graph, login)
     while True:
         index = choosePost(posts)
-        if index == -1:
+        if index == 1:
             break
-        if index == -2:
-            postRandomConfessions()
-            posts = convert(getPosts(graph, login['pageId']))['data']
+        if index == 0:
+            postRandomConfessions(graph)
+#            posts = convert(getPosts(graph, login['pageId']))['data']
+            posts = getPostsWrapper(page_index)
             continue
-        post = posts[index]
-        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
+        post = posts[index-2]
+        print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
         index = options("[bold]What type of Comment?[/bold] (Enter number to continue)", ["GPT2 Generated Comment", "Write My Own", "Write custom message with meme"])
         if index == 0:
-            print(post)
             generateComment(graph, post)
         elif index == 1:
             print("[#03c6fc]Type Comment:[/#03c6fc]")
             comment = input() 
             comment_link = makeComment(graph, post, comment)
-            print(f"[bold]Posted. See it here {comment_link} [/bold]")
+            if comment_link != None:
+                print(f"[bold]Posted. See it here {comment_link} [/bold]")
         else:
             memes = memer.get_all_memes()
             names = [meme['name'] for meme in memes]

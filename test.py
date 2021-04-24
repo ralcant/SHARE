@@ -2,6 +2,7 @@ import requests
 import json
 import facebook
 import string 
+import pyperclip
 from rich import print
 from decouple import config
 
@@ -38,10 +39,16 @@ def generateComment(message):
 
 
 def makeComment(graph, post, comment):
-    res = graph.put_comment(object_id = post['id'], message =comment)
-    story_fbid, comment_id = res['id'].split("_")
-    comment_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post['id']}&comment_id={comment_id}"
-    return comment_link
+    try:
+        res = graph.put_comment(object_id = post['id'], message =comment)
+        print('Comment posted!')
+        story_fbid, comment_id = res['id'].split("_")
+        comment_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post['id']}&comment_id={comment_id}"
+        return comment_link
+    except:
+        pyperclip.copy(comment)
+        print(f"[bold]Comment failed to post\nCopied to clipboard, paste here: {post['link']} [/bold]")
+        return None
 def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, secondPrompt=True, pageId=PAGE_ID):
     """Comments on every confession on the page using generateComment"""
     posts = convert(getPosts(pageId))
@@ -52,9 +59,9 @@ def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, 
             if ans == "NO":
                 continue 
         comments =  generateComment(post['message'], num)
-        print(f"\n----\nCONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
+        print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]")
         for i in range(len(comments)):
-            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]\n----")
+            print(f"COMMENT {i+1}: [#03c6fc]{comments[i]}[/#03c6fc]")
         if secondPrompt or (len(comments) > 1):
             print(f"Which comment to post? (respond number or NO)")
             ans = input()
