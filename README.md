@@ -5,3 +5,8 @@ To reproduce results:
 3. Install the python requirements by running `pip install -r requirements.txt`
 4. Create a file called `.env` and write `ACCESS_TOKEN={token}` on it where `token` is the access token for the app (ask Raul to if you don't have it)
 5. Execute `python test.py`
+
+To get posts from other pages:
+1. cd into this directory
+2. git clone https://github.com/kevinzg/facebook-scraper/
+3. pip install facebook-scraper
