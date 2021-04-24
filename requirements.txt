@@ -13,6 +13,7 @@ openai==0.6.2
 packaging==20.9
 Pygments==2.8.1
 pyparsing==2.4.7
+pyperclip==1.8.2
 python-decouple==3.4
 regex==2021.3.17
 requests==2.25.1
