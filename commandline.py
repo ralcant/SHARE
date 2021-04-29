@@ -11,22 +11,25 @@ from generateConfessions import postRandomConfessions
 from meme_utils import MemeGenerator
 import os
 import pyperclip
-from facebook_scraper import get_posts
+# from facebook_scraper import get_posts
 import shutil
 console = Console()
 import json
 
-from ibm_watson import ToneAnalyzerV3
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+try:
+    api_key = config('WATSON_KEY') 
+    from ibm_watson import ToneAnalyzerV3
+    from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-api_key = config('WATSON_KEY') 
-url = config('WATSON_URL')
 
-# authentication + setup for ibm_watson tone analyzer
-authenticator = IAMAuthenticator(apikey=api_key)
-tone_analyzer = ToneAnalyzerV3(version='2017-09-21', authenticator=authenticator)
-tone_analyzer.set_service_url(url)
+    url = config('WATSON_URL')
 
+    # authentication + setup for ibm_watson tone analyzer
+    authenticator = IAMAuthenticator(apikey=api_key)
+    tone_analyzer = ToneAnalyzerV3(version='2017-09-21', authenticator=authenticator)
+    tone_analyzer.set_service_url(url)
+except:
+    pass
 info = json.loads(config("ACCESS_TOKENS"))
 print(info)
 print(shutil.get_terminal_size())
@@ -55,19 +58,24 @@ def options(headerText, choices, start=0):
     print(f"[bold]You chose[/bold] {ans}")
     return num
 def promptAccounts():
-    #index = options("[bold]Accounts:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
-    return 1#info[index]
+    index = options("[bold]Accounts:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
+    return info[index]
 #def promptPage():
 #    index = options("[bold]Where to Post:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
 #    return info[index]['pageId']
 def choosePost(posts):
     choices = []
-    for i in range(min(len(posts), 10)):
-        tone = tone_analyzer.tone(posts[i]['message']).get_result()['document_tone']['tones'][0]['tone_id'].upper()
-        clipmsg = posts[i]['message'].split('\n')[0]
-        choices.append(f"[white]{ ('[' + tone + '] ' + clipmsg)[:(size-6)]}[/white]")
     choices.append(f"[#FFB6C1]Generate New Post[/#FFB6C1]")
     choices.append(f"[#FFB6C1]Quit[/#FFB6C1]")
+    for i in range(min(len(posts), 10)):
+        tone = ""
+        try:
+            tone = '[' + tone_analyzer.tone(posts[i]['message']).get_result()['document_tone']['tones'][0]['tone_id'].upper() + ']'
+        except:
+            pass
+        clipmsg = posts[i]['message'].split('\n')[0]
+        choices.append(f"[white]{ (tone + clipmsg)[:(size-6)]}[/white]")
+    
     for i in range(len(posts)):
         clipmsg = posts[i]['message'].split('\n')[0]
         choices.append(f"[white]{(clipmsg)[:(size-6)]}[/white]")
@@ -92,6 +100,7 @@ def generateComment(graph, post, link=''):
         print("Okay, will not comment.")
     return comment_link
 def getPostsWrapper(index, graph=None, login=None):
+    return convert(getPosts(graph, login['pageId']))['data'] # fix the get_posts bug?!? then change this back
     if index == 0:
         return convert(getPosts(graph, login['pageId']))['data']
     else: #index=1, for now just beaverconfessions
@@ -111,7 +120,7 @@ def main():
     login = promptAccounts()
     graph = setAccount(login)
     memer = MemeGenerator("mit_meme_creator", "mit_meme_password", graph)
-    page_index = options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
+    page_index = 0# options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
     posts = getPostsWrapper(page_index, graph, login)
     while True:
         index = choosePost(posts)
