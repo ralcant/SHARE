@@ -8,6 +8,7 @@ from decouple import config
 ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
+pagegraph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1)
 
 def setAccount(info={'access_token': ACCESS_TOKEN, 'pageId': PAGE_ID}):
     return facebook.GraphAPI(access_token=info['access_token'], version = 3.1) #what version should we use?
@@ -29,7 +30,7 @@ def convert(input): #From answer https://stackoverflow.com/questions/13101653/py
 
 def getPosts(graph, MY_PAGE_ID=PAGE_ID):
     """Get all of the posts on the page"""
-    posts = graph.request(f"/{MY_PAGE_ID}/published_posts")
+    posts = pagegraph.request(f"/{MY_PAGE_ID}/published_posts")
     return posts 
 
 def generateComment(message):
@@ -73,7 +74,7 @@ def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, 
 def makePost(graph, message):
     """Makes a post on the page with the given message"""
     print(f"Making post: {message}")
-    graph.put_object(parent_object='me', connection_name='feed', message=message)
+    graph.put_object(parent_object=PAGE_ID, connection_name='feed', message=message)
 
 def makePostPrompt(graph, message):
     """Makes a post on the page with the given message.. but prompts us first if its okay"""
