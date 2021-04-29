@@ -11,7 +11,7 @@ from generateConfessions import postRandomConfessions
 from meme_utils import MemeGenerator
 import os
 import pyperclip
-# from facebook_scraper import get_posts
+from facebook_scraper import get_posts
 import shutil
 console = Console()
 import json
@@ -54,6 +54,7 @@ def options(headerText, choices, start=0):
             pass
     
     if(num+1 == i):
+        print("START: "+str(start))
         return options(headerText, choices, start+10)
     print(f"[bold]You chose[/bold] {ans}")
     return num
@@ -67,14 +68,14 @@ def choosePost(posts):
     choices = []
     choices.append(f"[#FFB6C1]Generate New Post[/#FFB6C1]")
     choices.append(f"[#FFB6C1]Quit[/#FFB6C1]")
-    for i in range(min(len(posts), 10)):
-        tone = ""
-        try:
-            tone = '[' + tone_analyzer.tone(posts[i]['message']).get_result()['document_tone']['tones'][0]['tone_id'].upper() + ']'
-        except:
-            pass
-        clipmsg = posts[i]['message'].split('\n')[0]
-        choices.append(f"[white]{ (tone + clipmsg)[:(size-6)]}[/white]")
+    #for i in range(min(len(posts), 10)): <-- wait we only do this for max 10 possts?
+     #   tone = ""
+    #    try:
+     #       tone = '[' + tone_analyzer.tone(posts[i]['message']).get_result()['document_tone']['tones'][0]['tone_id'].upper() + ']'
+     #   except:
+     #       pass
+     #   clipmsg = posts[i]['message'].split('\n')[0]
+     #   choices.append(f"[white]{ (tone + clipmsg)[:(size-6)]}[/white]")
     
     for i in range(len(posts)):
         clipmsg = posts[i]['message'].split('\n')[0]
@@ -100,7 +101,7 @@ def generateComment(graph, post, link=''):
         print("Okay, will not comment.")
     return comment_link
 def getPostsWrapper(index, graph=None, login=None):
-    return convert(getPosts(graph, login['pageId']))['data'] # fix the get_posts bug?!? then change this back
+    # return convert(getPosts(graph, login['pageId']))['data'] # fix the get_posts bug?!? then change this back
     if index == 0:
         return convert(getPosts(graph, login['pageId']))['data']
     else: #index=1, for now just beaverconfessions
@@ -120,7 +121,7 @@ def main():
     login = promptAccounts()
     graph = setAccount(login)
     memer = MemeGenerator("mit_meme_creator", "mit_meme_password", graph)
-    page_index = 0# options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
+    page_index = options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
     posts = getPostsWrapper(page_index, graph, login)
     while True:
         index = choosePost(posts)
@@ -131,6 +132,8 @@ def main():
 #            posts = convert(getPosts(graph, login['pageId']))['data']
             posts = getPostsWrapper(page_index)
             continue
+        # print(post)
+        
         post = posts[index-2]
         print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
         index = options("[bold]What type of Comment?[/bold] (Enter number to continue)", ["GPT2 Generated Comment", "Write My Own", "Write custom message with meme"])
