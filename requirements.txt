@@ -13,6 +13,7 @@ openai==0.6.2
 packaging==20.9
 Pygments==2.8.1
 pyparsing==2.4.7
+pyperclip==1.8.2
 python-decouple==3.4
 regex==2021.3.17
 requests==2.25.1
@@ -27,3 +28,4 @@ typing-extensions==3.7.4.3
 unicode==2.8
 urllib3==1.26.4
 zipp==3.4.1
+ibm_watson=5.1.0
