@@ -59,8 +59,8 @@ def options(headerText, choices, start=0):
     print(f"[bold]You chose[/bold] {ans}")
     return num
 def promptAccounts():
-    index = options("[bold]Accounts:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
-    return info[index]
+    #index = options("[bold]Accounts:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
+    return info[1]#index]
 #def promptPage():
 #    index = options("[bold]Where to Post:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
 #    return info[index]['pageId']
@@ -121,7 +121,7 @@ def main():
     login = promptAccounts()
     graph = setAccount(login)
     memer = MemeGenerator("mit_meme_creator", "mit_meme_password", graph)
-    page_index = options('Which page?', ['Fake MIT Confessions', 'beaverconfessions'])
+    page_index = options('Pick a Page:', ['Fake MIT Confessions', 'Real MIT Confessions'])
     posts = getPostsWrapper(page_index, graph, login)
     while True:
         index = choosePost(posts)
@@ -141,7 +141,9 @@ def main():
             generateComment(graph, post)
         elif index == 1:
             print("[#03c6fc]Type Comment:[/#03c6fc]")
-            comment = input() 
+            comment = input()
+            if len(comment) == 0:
+                comment = "no comment" 
             comment_link = makeComment(graph, post, comment)
             if comment_link != None:
                 print(f"[bold]Posted. See it here {comment_link} [/bold]")
