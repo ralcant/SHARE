@@ -4,14 +4,17 @@ import json
 # import openai 
 # import torch
 from test import commentRandomly
-from transformers import pipeline
+
+from test import enablePrint, blockPrint
 import random
 # from decouple import config
 # import gpt_2_simple as gpt2
 # import os
 # import requests
 
+print("Loading...")
 
+from transformers import pipeline
 generator = pipeline('text-generation', model='gpt2')
 
 # openai.api_key = config("OPENAI_ACCESS_TOKEN")
@@ -113,7 +116,8 @@ def generateCommentGPT3(msg):
     return [response.choices[0].text.strip()]
 
 def main():
-    commentWithGPT2(num=5)
+   #commentWithGPT2(num=5)
+   pass
     
 
    
