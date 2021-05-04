@@ -3,6 +3,7 @@ import json
 import facebook
 import string 
 import pyperclip
+import sys, os
 from rich import print
 from decouple import config
 
@@ -10,7 +11,10 @@ ACCESS_TOKEN = config("ACCESS_TOKEN") #long-lived acces token
 # ACCESS_TOKEN = "EAADVGvvhhvABAPJBOf3HZATKd0hGBugwVdrPU0JlM8VvFiNQLU6HFRnmhovf20QSZBiWxGdKSRYdjoZAOSnnKixaq4hFXRPcXgZCnTPxHNRypldziDTQl8JWonup9n1zwzcek3L4iVzVD8ZA68l7zxPBpH3iSHDmXs8X4RNL3nmeokfgIj3Xsl2xqpb35klAZD" #access token with commenting rights
 PAGE_ID = 100691552123875 #id of https://www.facebook.com/Fake-MIT-Confessions-100691552123875
 pagegraph = facebook.GraphAPI(access_token=ACCESS_TOKEN, version = 3.1)
-
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+def enablePrint():
+    sys.stdout = sys.__stdout__
 def setAccount(info={'access_token': ACCESS_TOKEN, 'pageId': PAGE_ID}):
     return facebook.GraphAPI(access_token=info['access_token'], version = 3.1) #what version should we use?
     
@@ -41,14 +45,17 @@ def generateComment(message):
 
 def makeComment(graph, post, comment):
     try:
+        blockPrint()
         res = graph.put_comment(object_id = post['id'], message =comment)
+        enablePrint()
         print('Comment posted!')
         story_fbid, comment_id = res['id'].split("_")
         comment_link = f"https://facebook.com/permalink.php?story_fbid={story_fbid}&id={post['id']}&comment_id={comment_id}"
         return comment_link
     except:
+        enablePrint()
         pyperclip.copy(comment)
-        print(f"[bold]Comment failed to post\nCopied to clipboard, paste here: {post['link']} [/bold]")
+        print(f"[bold]Copied to clipboard, paste here: {post['link']} [/bold]")
         return None
 def commentRandomly(graph, generateComment=generateComment, num=1, prompt=True, secondPrompt=True, pageId=PAGE_ID):
     """Comments on every confession on the page using generateComment"""
