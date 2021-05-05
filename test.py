@@ -117,7 +117,7 @@ def postDemo(pageId=PAGE_ID):
         print("Post:")
         print("\t"+post['message']) 
         print("Comments:")
-        all_comments = getCommentsFromPost(post['id'])
+        all_comments = getCommentsFromPost(pagegraph, post['id'])
         for i, comment in enumerate(all_comments):
             print(f"\t{i}."+comment['message'])
         print()
