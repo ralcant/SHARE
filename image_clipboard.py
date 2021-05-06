@@ -29,7 +29,7 @@ def windows_copy_local_image_to_clipboard(path):
 def copy_local_image_to_clipboard(path):
     system = platform.system()
     if system == "Windows":
-        return windows_copy_local_image(path)
+        return windows_copy_local_image_to_clipboard(path)
     elif system == "Java":
         pass
     elif system == "Linux":
@@ -37,4 +37,4 @@ def copy_local_image_to_clipboard(path):
     else:
         print("Lol what system do you have") 
 if __name__ == "__main__":
-    windows_copy_local_image("images/testxd.jpg")
+    windows_copy_local_image_to_clipboard("images/testxd.jpg")
