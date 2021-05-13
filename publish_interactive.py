@@ -2,7 +2,7 @@ from confessionscommenter.commandline_utils import generateComments, options, ch
 from confessionscommenter.meme_utils import MemeGenerator
 from confessionscommenter.general_utils import getPosts, convert
 
-from facebook_utils import setAccount, postComment, post_image_from_url #, postRandomConfessions
+from facebook_utils import ACCESS_TOKEN, setAccount, postComment, post_image_from_url #, postRandomConfessions
 
 import os
 from rich import print
@@ -11,7 +11,8 @@ from decouple import config
 import shutil
 console = Console()
 import json
-
+ACCESS_TOKEN = config('ACCESS_TOKEN')
+PAGE_ID = 100691552123875
 try:
     api_key = config('WATSON_KEY') 
     from ibm_watson import ToneAnalyzerV3
@@ -23,23 +24,16 @@ try:
     tone_analyzer.set_service_url(url)
 except:
     pass
-info = json.loads(config("ACCESS_TOKENS"))
 print(shutil.get_terminal_size())
 size = int(shutil.get_terminal_size()[0])
-def promptAccounts():
-    #index = options("[bold]Accounts:[/bold] (Enter number to continue)", [info[i]['name'] for i in range(len(info))])
-    return info[1]#index]
 def main():
     os.system("clear")
     console.rule("[bold blue]Welcome to SHARE, the MIT Confessions Bot")
     print()
-    print("[cyan]Login Info")
-    login = promptAccounts()
-    graph = setAccount(login)
+    print("[cyan]We are using the 'Fake MIT Confessions' Page")
+    graph = setAccount(info={"access_token": ACCESS_TOKEN, "pageId": PAGE_ID})
     memer = MemeGenerator()
-    page_index = options('Pick a Page:', ['Fake MIT Confessions', 'Real MIT Confessions'])
-    page_titles = ["Fake-MIT-Confessions-100691552123875", "beaverconfessions"]
-    posts = convert(getPosts(title=page_titles[page_index])) #Maybe save it on disk so that you don't make too many calls to facebook scraper? Otherwise it ends up returning no answers :(
+    posts = convert(getPosts(title="Fake-MIT-Confessions-100691552123875")) #Maybe save it on disk so that you don't make too many calls to facebook scraper? Otherwise it ends up returning no answers :(
     if len(posts) == 0:
         print("There doesn't seem to be any post here!. If you are using facebook-scraper then you might need to wait")
         return
@@ -48,7 +42,7 @@ def main():
         if index == 0:
             break
         post = posts[index-1]
-        print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]\n----)")
+        print(f"CONFESSION: [#f5a6ff]{post['message']}[/#f5a6ff]")
         index = options(
             "[bold]What type of Comment?[/bold] (Enter number to continue)", 
             [
@@ -69,8 +63,12 @@ def main():
             print(f"[bold]Posted meme!. See it here: {meme_info['data']['url']}[/bold]")
 
             """Extra"""
-            print("Now publishing to facebook...")
-            post_image_from_url(graph, meme_info['data']['url'], post['id'], extra_message="Generated meme ;)", remove_local=True) #TODO: Maybe put a default link to our page or sth
+            print(f"Would you like this meme on facebook? (YES or NO)")
+            if input() == "YES":
+                print("Now publishing to facebook...")
+                post_image_from_url(graph, meme_info['data']['url'], post['id'], extra_message="Generated meme ;)", remove_local=True) #TODO: Maybe put a default link to our page or sth
+            else:
+                print("OK, will not post.")
         elif index == 2:
             memes = memer.get_popular_memes()
             names = [f"{meme['name']}. See examples at https://imgflip.com/meme/{meme['id']}" for meme in memes]
@@ -82,12 +80,12 @@ def main():
                 text = input()
                 captions.append(text)
             meme_info, _ = memer.create_meme(memes[i]['id'], captions)
-            print(f"[bold]Posted meme!. See it here: {meme_info['data']['url']}[/bold]")
-
+            print(f"[bold]See meme here: {meme_info['data']['url']}[/bold]")
+            
             """Extra"""
             print("Now publishing to facebook...")
             post_image_from_url(graph, meme_info['data']['url'], post['id'], extra_message="Generated meme ;)", remove_local=True) #TODO: Maybe put a default link to our page or sth
-
+            
         elif index == 3:
             print("[#03c6fc]Type Comment:[/#03c6fc] ", end="")
             comment = input()
