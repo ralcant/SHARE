@@ -1,10 +1,11 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' #To prevent tensorflow from printing stuff we don't care about...
 from confessionscommenter.commandline_utils import generateComments, options, choosePost
 from confessionscommenter.meme_utils import MemeGenerator
 from confessionscommenter.general_utils import getPosts, convert
 
 from facebook_utils import ACCESS_TOKEN, setAccount, postComment, post_image_from_url #, postRandomConfessions
 
-import os
 from rich import print
 from rich.console import Console
 from decouple import config
@@ -35,7 +36,7 @@ def main():
     memer = MemeGenerator()
     posts = convert(getPosts(title="Fake-MIT-Confessions-100691552123875")) #Maybe save it on disk so that you don't make too many calls to facebook scraper? Otherwise it ends up returning no answers :(
     if len(posts) == 0:
-        print("There doesn't seem to be any post here!. If you are using facebook-scraper then you might need to wait")
+        print("There doesn't seem to be any post here!. If you are using facebook-scraper then you might need to wait a few minutes.")
         return
     while True:
         index = choosePost(posts)
